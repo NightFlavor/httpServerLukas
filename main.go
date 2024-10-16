@@ -15,7 +15,10 @@ func give_website(w http.ResponseWriter, r *http.Request) {
 	io.Copy(w, htmlFile)
 }
 func pull_and_restart(w http.ResponseWriter, r *http.Request) {
-	exec.Command("pull.sh")
+	fmt.Println("pulling and rebooting")
+	cmd := exec.Command("pull.sh")
+	output, _ := cmd.Output()
+	fmt.Println(string(output))
 }
 func main() {
 	http.HandleFunc("/", give_website)

@@ -1,3 +1,4 @@
+echo "bitchass"
 cd ~/httpserver
 sudo systemctl stop lukasweb.service
 rm pull.sh
