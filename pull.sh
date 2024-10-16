@@ -1,5 +1,6 @@
 cd ~/httpserver
-systemctl stop httpweb.service
+systemctl stop lukasweb.service
 git pull
+chmod +x pull.sh
 go build main.go
-systemctl start httpweb.service
+systemctl start lukasweb.service
