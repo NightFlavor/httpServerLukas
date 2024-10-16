@@ -1,10 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
-	"fmt"
 	"os/exec"
 )
 
@@ -14,15 +14,15 @@ func give_website(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	io.Copy(w, htmlFile)
 }
-func pull_and_restart(w http.ResponseWriter, r *http.Request){
+func pull_and_restart(w http.ResponseWriter, r *http.Request) {
 	exec.Command("pull.sh")
 }
 func main() {
 	http.HandleFunc("/", give_website)
 	fileServer := http.FileServer(http.Dir("./html"))
-	http.HandleFunc("pull",pull_and_restart)
+	http.HandleFunc("/pull", pull_and_restart)
 	http.Handle("/html/", http.StripPrefix("/html/", fileServer))
 	port := "12350"
-	fmt.Println("starting server on ",port)
+	fmt.Println("starting server on ", port)
 	http.ListenAndServe(":"+port, nil)
 }
