@@ -1,6 +1,5 @@
-cd ~/httpServerLukas
+cd ~/httpserver
+systemctl stop httpweb.service
 git pull
-
-go build -o your-go-program-name .
-
-./your-go-program-name
+go build main.go
+systemctl start httpweb.service
