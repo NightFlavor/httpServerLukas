@@ -14,10 +14,8 @@ func give_website(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/index.html", give_website)
-
+	http.HandleFunc("/", give_website)
 	fileServer := http.FileServer(http.Dir("./html"))
 	http.Handle("/html/", http.StripPrefix("/html/", fileServer))
-
-	http.ListenAndServe(":80", nil)
+	http.ListenAndServe(":12350", nil)
 }
