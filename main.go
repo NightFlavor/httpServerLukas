@@ -28,11 +28,9 @@ func pull_and_restart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	scriptPath := filepath.Join(homeDir, "httpserver/pull.sh")
-
 	cmd := exec.Command("bash", "-c", scriptPath)
-	output, err := cmd.CombinedOutput() // CombinedOutput captures both stdout and stderr
+	output, err := cmd.CombinedOutput()
 	if err != nil {
-		// Print detailed error information
 		fmt.Println("Error running script:", err)
 		fmt.Println("Script output:", string(output))
 		http.Error(w, "Failed to run script", http.StatusInternalServerError)
