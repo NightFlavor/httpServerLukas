@@ -29,7 +29,7 @@ func pull_and_restart(w http.ResponseWriter, r *http.Request) {
 	}
 	scriptPath := filepath.Join(homeDir, "httpserver/pull.sh")
 
-	cmd := exec.Command(scriptPath)
+	cmd := exec.Command("bash", "-c", scriptPath)
 	output, err := cmd.CombinedOutput() // CombinedOutput captures both stdout and stderr
 	if err != nil {
 		// Print detailed error information
