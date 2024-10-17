@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 func give_website(w http.ResponseWriter, r *http.Request) {
@@ -21,10 +22,17 @@ func give_website(w http.ResponseWriter, r *http.Request) {
 
 func pull_and_restart(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("pulling and rebooting")
-	cmd := exec.Command("~httpserver/pull.sh")
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		http.Error(w, "Failed to find home directory", http.StatusInternalServerError)
+		return
+	}
+	scriptPath := filepath.Join(homeDir, "httpserver/pull.sh")
+
+	cmd := exec.Command(scriptPath)
 	output, err := cmd.Output()
 	if err != nil {
-		http.Error(w, "Failed to run script", http.StatusInternalServerError)
+		http.Error(w, "Failed to run script"+homeDir, http.StatusInternalServerError)
 		return
 	}
 	fmt.Println(string(output))
