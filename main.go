@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -22,6 +23,7 @@ func dynamicHandler(w http.ResponseWriter, r *http.Request) {
 	// Check if the requested template exists
 	if _, err := os.Stat(tmplPath); os.IsNotExist(err) {
 		http.Error(w, "404 Not Found in dynamicHandler", http.StatusNotFound)
+		log.Printf("Template not found: %s, error: %v", tmplPath, err)
 		return
 	}
 
@@ -30,18 +32,20 @@ func dynamicHandler(w http.ResponseWriter, r *http.Request) {
 		Title  string
 		Header string
 	}{
-		Title:  page, // You can customize this or make it dynamic
+		Title:  page,
 		Header: "Welcome to " + page,
 	}
 
 	// Render the template if it exists
 	renderTemplate(w, tmplPath, data)
 }
+
 func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 	// Parse layout and requested template
 	t, err := template.ParseFiles("templates/layout.html", tmpl)
 	if err != nil {
 		http.Error(w, "404 Not Found in renderTemplate", http.StatusNotFound)
+		log.Printf("Failed to parse templates: %v, error: %v", tmpl, err)
 		return
 	}
 
@@ -49,25 +53,30 @@ func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 	err = t.Execute(w, data)
 	if err != nil {
 		http.Error(w, "Error rendering template", http.StatusInternalServerError)
+		log.Printf("Error executing template %s: %v", tmpl, err)
 	}
 }
+
 func pull_and_restart(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("pulling and rebooting")
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		http.Error(w, "Failed to find home directory", http.StatusInternalServerError)
+		log.Printf("Failed to get home directory: %v", err)
 		return
 	}
 	scriptPath := filepath.Join(homeDir, "httpserver/pull.sh")
 	cmd := exec.Command("bash", "-c", scriptPath)
+
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Println("Error running script:", err)
-		fmt.Println("Script output:", string(output))
 		http.Error(w, "Failed to run script", http.StatusInternalServerError)
+		log.Printf("Error running script: %v, output: %s", err, string(output))
 		return
 	}
+
 	fmt.Println(string(output))
+	log.Printf("Script output: %s", string(output))
 }
 
 func main() {
@@ -76,6 +85,12 @@ func main() {
 	cssFileServer := http.FileServer(http.Dir("./css"))
 	http.Handle("/css/", http.StripPrefix("/css/", cssFileServer))
 	port := "80"
-	fmt.Println("starting server on ", port)
-	http.ListenAndServe(":"+port, nil)
+	fmt.Println("starting server on port", port)
+	log.Printf("Starting server on port %s", port)
+
+	// Use log.Fatal to catch errors with ListenAndServe
+	err := http.ListenAndServe(":"+port, nil)
+	if err != nil {
+		log.Fatalf("Error starting server: %v", err)
+	}
 }
