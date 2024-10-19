@@ -1,0 +1,32 @@
+html{
+    --base00: #06070E;
+    --base01: #0b0d14;
+    --text:#f0f3ff;
+    --title-size: 5em;
+    --sub-title-size: 3em;
+}
+*{
+    display: flex;
+    flex-direction: column;
+    background-color: var(--base00);
+    color: var(--text);
+    text-align: center;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+footer{
+    position: relative;
+    bottom: 90%;
+}
+h1{
+    font-size: var(--title-size);
+}
+h2{
+    font-size: var(--sub-title-size);
+}
+#top_bar{
+    flex-direction: row;
+    display: flex;
+    justify-content: center;
+}

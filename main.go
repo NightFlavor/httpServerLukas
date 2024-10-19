@@ -2,24 +2,55 @@ package main
 
 import (
 	"fmt"
-	"io"
+	"html/template"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 )
 
-func give_website(w http.ResponseWriter, r *http.Request) {
-	htmlFile, err := os.Open("html/index.html")
-	if err != nil {
-		http.Error(w, "Could not open file", http.StatusInternalServerError)
+func dynamicHandler(w http.ResponseWriter, r *http.Request) {
+	// Remove the leading slash and append ".html"
+	page := r.URL.Path[1:] // e.g., "/about" -> "about"
+	if page == "" {
+		page = "index" // Default to index if no page is specified
+	}
+
+	// Construct the template path
+	tmplPath := filepath.Join("templates", page+".html")
+
+	// Check if the requested template exists
+	if _, err := os.Stat(tmplPath); os.IsNotExist(err) {
+		http.Error(w, "404 Not Found in dynamicHandler", http.StatusNotFound)
 		return
 	}
-	defer htmlFile.Close()
-	w.Header().Set("Content-Type", "text/html")
-	io.Copy(w, htmlFile)
-}
 
+	// Define the data to pass to the template
+	data := struct {
+		Title  string
+		Header string
+	}{
+		Title:  page, // You can customize this or make it dynamic
+		Header: "Welcome to " + page,
+	}
+
+	// Render the template if it exists
+	renderTemplate(w, tmplPath, data)
+}
+func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
+	// Parse layout and requested template
+	t, err := template.ParseFiles("templates/layout.html", tmpl)
+	if err != nil {
+		http.Error(w, "404 Not Found in renderTemplate", http.StatusNotFound)
+		return
+	}
+
+	// Execute the template with the provided data
+	err = t.Execute(w, data)
+	if err != nil {
+		http.Error(w, "Error rendering template", http.StatusInternalServerError)
+	}
+}
 func pull_and_restart(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("pulling and rebooting")
 	homeDir, err := os.UserHomeDir()
@@ -40,11 +71,11 @@ func pull_and_restart(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", give_website)
-	fileServer := http.FileServer(http.Dir("./html"))
+	http.HandleFunc("/", dynamicHandler)
 	http.HandleFunc("/pull", pull_and_restart)
-	http.Handle("/html/", http.StripPrefix("/html/", fileServer))
-	port := "12350"
+	cssFileServer := http.FileServer(http.Dir("./css"))
+	http.Handle("/css/", http.StripPrefix("/css/", cssFileServer))
+	port := "80"
 	fmt.Println("starting server on ", port)
 	http.ListenAndServe(":"+port, nil)
 }
