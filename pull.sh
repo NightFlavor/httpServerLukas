@@ -1,4 +1,4 @@
-cd ~/httpserver
+cd /root/home/nightflavor/httpserver
 #!/bin/bash
 git pull
 go build -o /path/to/output
