@@ -59,15 +59,9 @@ func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 
 func pull_and_restart(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("pulling and rebooting")
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		http.Error(w, "Failed to find home directory", http.StatusInternalServerError)
-		log.Printf("Failed to get home directory: %v", err)
-		return
-	}
 
-	// Construct the script path
-	scriptPath := filepath.Join(homeDir, "httpserver/pull.sh")
+	// Use the absolute path directly, since we know where the script is located
+	scriptPath := "/home/nightflavor/httpserver/pull.sh"
 	cmd := exec.Command("bash", "-c", scriptPath)
 
 	// Capture the output of the script
@@ -87,6 +81,7 @@ func pull_and_restart(w http.ResponseWriter, r *http.Request) {
 	// Respond to the HTTP request with the script output
 	fmt.Fprintf(w, "Script executed successfully: %s", string(output))
 }
+
 
 func main() {
 	http.HandleFunc("/", dynamicHandler)
