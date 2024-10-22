@@ -1,4 +1,4 @@
-cd /home/nightflavor/httpserver || exit
+cd /home/nightflavor/httpserver
 
 git reset --hard
 git pull
