@@ -14,13 +14,11 @@ func dynamicHandler(w http.ResponseWriter, r *http.Request) {
 	// Remove the leading slash and append ".html"
 	page := r.URL.Path[1:] // e.g., "/about" -> "about"
 	if page == "" {
-		page = "index" // Default to index if no page is specified
+		page = "index"
 	}
 
-	// Construct the template path
 	tmplPath := filepath.Join("templates", page+".html")
 
-	// Check if the requested template exists
 	if _, err := os.Stat(tmplPath); os.IsNotExist(err) {
 		http.Error(w, "404 Not Found in dynamicHandler", http.StatusNotFound)
 		log.Printf("Template not found: %s, error: %v", tmplPath, err)
@@ -59,7 +57,9 @@ func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 
 func pull_and_restart(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("pulling and rebooting")
-
+	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Pulled and restarted succesfully"))
 	// Use the absolute path directly, since we know where the script is located
 	scriptPath := "/home/nightflavor/httpserver/pull.sh"
 	cmd := exec.Command("bash", "-c", scriptPath)
@@ -74,14 +74,8 @@ func pull_and_restart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Print the output to both the console and the log
-	fmt.Println("Script output:", string(output))
-	log.Printf("Script output: %s", string(output))
-
-	// Respond to the HTTP request with the script output
 	fmt.Fprintf(w, "Script executed successfully: %s", string(output))
 }
-
 
 func main() {
 	http.HandleFunc("/", dynamicHandler)
@@ -92,7 +86,6 @@ func main() {
 	fmt.Println("starting server on port", port)
 	log.Printf("Starting server on port %s", port)
 
-	// Use log.Fatal to catch errors with ListenAndServe
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		log.Fatalf("Error starting server: %v", err)
