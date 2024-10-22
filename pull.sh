@@ -1,6 +1,8 @@
-cd /root/home/nightflavor/httpserver
+cd /home/nightflavor/httpserver || exit
+
 git reset --hard
 git pull
-go build -o /root/home/nightflavor/httpserver/main.go
-sudo /bin/systemctl restart lukasweb.service
 
+go build -o main main.go
+
+sudo /bin/systemctl restart lukasweb.service
