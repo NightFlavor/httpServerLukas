@@ -54,12 +54,14 @@ func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 		log.Printf("Error executing template %s: %v", tmpl, err)
 	}
 }
-
-func pull_and_restart(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("pulling and rebooting")
+func succesfullPullHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Pulled and restarted succesfully"))
+}
+func pull_and_restart(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("pulling and rebooting")
+	http.Redirect(w, r, "/pullsucces", http.StatusFound)
 	// Use the absolute path directly, since we know where the script is located
 	scriptPath := "/home/nightflavor/httpserver/pull.sh"
 	cmd := exec.Command("bash", "-c", scriptPath)
@@ -80,6 +82,7 @@ func pull_and_restart(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc("/", dynamicHandler)
 	http.HandleFunc("/pull", pull_and_restart)
+	http.HandleFunc("/pullsucces", succesfullPullHandler)
 	cssFileServer := http.FileServer(http.Dir("./css"))
 	http.Handle("/css/", http.StripPrefix("/css/", cssFileServer))
 	port := "80"
