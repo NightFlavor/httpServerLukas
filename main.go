@@ -65,18 +65,27 @@ func pull_and_restart(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Failed to get home directory: %v", err)
 		return
 	}
-	scriptPath := filepath.Join(homeDir, "/home/nightflavor/httpserver/pull.sh")
+
+	// Construct the script path
+	scriptPath := filepath.Join(homeDir, "httpserver/pull.sh")
 	cmd := exec.Command("bash", "-c", scriptPath)
 
+	// Capture the output of the script
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		http.Error(w, "Failed to run script", http.StatusInternalServerError)
 		log.Printf("Error running script: %v, output: %s", err, string(output))
+		fmt.Println("Error running script:", err)
+		fmt.Println("Script output:", string(output))
 		return
 	}
 
-	fmt.Println(string(output))
+	// Print the output to both the console and the log
+	fmt.Println("Script output:", string(output))
 	log.Printf("Script output: %s", string(output))
+
+	// Respond to the HTTP request with the script output
+	fmt.Fprintf(w, "Script executed successfully: %s", string(output))
 }
 
 func main() {
