@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 )
 
 func dynamicHandler(w http.ResponseWriter, r *http.Request) {
@@ -58,6 +59,8 @@ func succesfullPullHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Pulled and restarted successfully"))
+	time.Sleep(5 * time.Second)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func pull_and_restart(w http.ResponseWriter, r *http.Request) {
@@ -82,15 +85,11 @@ func pull_and_restart(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Welcome to the home page!")
-	})
+	http.HandleFunc("/", dynamicHandler)
 	http.HandleFunc("/pull", pull_and_restart)
 	http.HandleFunc("/pullsucces", succesfullPullHandler)
-
 	cssFileServer := http.FileServer(http.Dir("./css"))
 	http.Handle("/css/", http.StripPrefix("/css/", cssFileServer))
-
 	port := "80"
 	fmt.Println("starting server on port", port)
 	log.Printf("Starting server on port %s", port)
