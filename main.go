@@ -57,34 +57,40 @@ func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 func succesfullPullHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Pulled and restarted succesfully"))
+	w.Write([]byte("Pulled and restarted successfully"))
 }
+
 func pull_and_restart(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("pulling and rebooting")
-	http.Redirect(w, r, "/pullsucces", http.StatusFound)
-	// Use the absolute path directly, since we know where the script is located
+
+	// Initiate the script execution in a goroutine
 	scriptPath := "/home/nightflavor/httpserver/pull.sh"
-	cmd := exec.Command("bash", "-c", scriptPath)
+	go func() {
+		cmd := exec.Command("bash", "-c", scriptPath)
 
-	// Capture the output of the script
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		http.Error(w, "Failed to run script", http.StatusInternalServerError)
-		log.Printf("Error running script: %v, output: %s", err, string(output))
-		fmt.Println("Error running script:", err)
-		fmt.Println("Script output:", string(output))
-		return
-	}
+		// Capture the output of the script
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			log.Printf("Error running script: %v, output: %s", err, string(output))
+			return // Log the error without affecting the HTTP response
+		}
+		fmt.Println("Script executed successfully:", string(output))
+	}()
 
-	fmt.Fprintf(w, "Script executed successfully: %s", string(output))
+	// Redirect the user to the success page
+	http.Redirect(w, r, "/pullsucces", http.StatusFound)
 }
 
 func main() {
-	http.HandleFunc("/", dynamicHandler)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "Welcome to the home page!")
+	})
 	http.HandleFunc("/pull", pull_and_restart)
 	http.HandleFunc("/pullsucces", succesfullPullHandler)
+
 	cssFileServer := http.FileServer(http.Dir("./css"))
 	http.Handle("/css/", http.StripPrefix("/css/", cssFileServer))
+
 	port := "80"
 	fmt.Println("starting server on port", port)
 	log.Printf("Starting server on port %s", port)
