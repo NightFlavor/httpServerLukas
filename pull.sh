@@ -1,5 +1,5 @@
 cd /home/nightflavor/httpserver
-mkdir test
+
 git reset --hard
 git pull
 
