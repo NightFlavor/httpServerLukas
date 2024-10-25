@@ -1,5 +1,3 @@
-cd /home/nightflavor/httpserver
-
 git reset --hard
 git pull
 

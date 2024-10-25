@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"time"
 )
@@ -14,8 +13,23 @@ import (
 func dynamicHandler(w http.ResponseWriter, r *http.Request) {
 	// Remove the leading slash and append ".html"
 	page := r.URL.Path[1:] // e.g., "/about" -> "about"
+	pageTitle := "Title"
+	pageName := page
 	if page == "" {
 		page = "index"
+		pageName = "Home"
+		pageTitle = "Welcome to Lukas' portfolio:"
+	}
+
+	cookie, err := r.Cookie("mode")
+	mode := "light" // Default mode
+	if err == nil {
+		mode = cookie.Value
+	}
+
+	cssFile := "light.css"
+	if mode == "dark" {
+		cssFile = "dark.css"
 	}
 
 	tmplPath := filepath.Join("templates", page+".html")
@@ -25,18 +39,41 @@ func dynamicHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Template not found: %s, error: %v", tmplPath, err)
 		return
 	}
-
+	fmt.Print("/" + r.URL.Path)
 	// Define the data to pass to the template
 	data := struct {
-		Title  string
-		Header string
+		Title     string
+		CSS       string
+		Redirect  string
+		PageTitle string
 	}{
-		Title:  page,
-		Header: "Welcome to " + page,
+		Title:     pageName,
+		CSS:       cssFile,
+		Redirect:  r.URL.Path,
+		PageTitle: pageTitle,
 	}
 
 	// Render the template if it exists
 	renderTemplate(w, tmplPath, data)
+}
+
+func setModeHandler(w http.ResponseWriter, r *http.Request) {
+	// Get the mode from the query string (e.g., ?mode=dark)
+	mode := r.URL.Query().Get("mode")
+	redirect := r.URL.Query().Get("redirect")
+	if mode != "light" && mode != "dark" {
+		mode = "light" // Default to light if invalid value
+	}
+
+	// Set the mode cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:    "mode",
+		Value:   mode,
+		Expires: time.Now().Add(365 * 24 * time.Hour), // 1-year expiration
+		Path:    "/",
+	})
+	// Redirect back to the homepage (or wherever you want)
+	http.Redirect(w, r, redirect, http.StatusSeeOther)
 }
 
 func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
@@ -55,42 +92,17 @@ func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 		log.Printf("Error executing template %s: %v", tmpl, err)
 	}
 }
-func succesfullPullHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Pulled and restarted successfully"))
-	time.Sleep(5 * time.Second)
-	http.Redirect(w, r, "/", http.StatusFound)
-}
-
-func pull_and_restart(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("pulling and rebooting")
-
-	// Initiate the script execution in a goroutine
-	scriptPath := "/home/nightflavor/httpserver/pull.sh"
-	go func() {
-		cmd := exec.Command("bash", "-c", scriptPath)
-
-		// Capture the output of the script
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			log.Printf("Error running script: %v, output: %s", err, string(output))
-			return // Log the error without affecting the HTTP response
-		}
-		fmt.Println("Script executed successfully:", string(output))
-	}()
-
-	// Redirect the user to the success page
-	http.Redirect(w, r, "/pullsucces", http.StatusFound)
-}
 
 func main() {
 	http.HandleFunc("/", dynamicHandler)
-	http.HandleFunc("/pull", pull_and_restart)
-	http.HandleFunc("/pullsucces", succesfullPullHandler)
+
 	cssFileServer := http.FileServer(http.Dir("./css"))
+
+	http.HandleFunc("/set-mode", setModeHandler)
 	http.Handle("/css/", http.StripPrefix("/css/", cssFileServer))
-	port := "80"
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
+	port := "8000"
 	fmt.Println("starting server on port", port)
 	log.Printf("Starting server on port %s", port)
 

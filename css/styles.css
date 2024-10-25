@@ -1,32 +1,84 @@
-html{
-    --base00: #06070E;
-    --base01: #0b0d14;
-    --text:#f0f3ff;
-    --title-size: 5em;
-    --sub-title-size: 3em;
-}
-*{
+* {
     display: flex;
     flex-direction: column;
-    background-color: var(--base00);
     color: var(--text);
     text-align: center;
     font-family: "Montserrat", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
 }
-footer{
+
+html {
+    --title-size: 3em;
+    --sub-title-size: 2em;
+    background-color: var(--base00);
+}
+
+title {
+    display: none;
+}
+
+footer {
     position: relative;
     bottom: 90%;
 }
-h1{
+
+h1 {
     font-size: var(--title-size);
 }
-h2{
+
+h2 {
     font-size: var(--sub-title-size);
 }
-#top_bar{
+
+#top_bar {
     flex-direction: row;
     display: flex;
     justify-content: center;
+}
+
+#light_dark_selectors {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    align-self: center;
+    flex-wrap: wrap;
+    width: 15%;
+}
+
+#light_mode_selector {
+    fill: var(--text);
+    padding: 5px;
+    border-radius: 25%;
+    margin: 5px;
+    background-color: var(--base01);
+    transition-duration: 0.2s;
+    transition: ease-in-out;
+}
+
+#dark_mode_selector {
+    fill: var(--text);
+    padding: 5px;
+    border-radius: 25%;
+    margin: 5px;
+    background-color: var(--base01);
+    transition-duration: 0.2s;
+    transition: ease-in-out;
+}
+
+#light_mode_selector:hover {
+    background-color: var(--base02);
+}
+
+#dark_mode_selector:hover {
+    background-color: var(--base02);
+}
+
+#top_title {
+    margin: 0;
+    flex-grow: 8;
+}
+#pseudo_div{
+    flex-grow: 1;
+    width: 15%;
 }
