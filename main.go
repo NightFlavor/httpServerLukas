@@ -19,10 +19,15 @@ func dynamicHandler(w http.ResponseWriter, r *http.Request) {
 		page = "index"
 		pageName = "Home"
 		pageTitle = "Welcome to Lukas' portfolio:"
+	} else {
+		pageTitle = "Welcome to Lukas' " + page + " page"
 	}
 
 	cookie, err := r.Cookie("mode")
-	mode := "light" // Default mode
+
+	w.Header().Set("Accept-CH", "Sec-CH-Prefers-Color-Scheme")
+	mode := r.Header.Get("Sec-CH-Prefers-Color-Scheme")
+
 	if err == nil {
 		mode = cookie.Value
 	}
@@ -39,8 +44,7 @@ func dynamicHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Template not found: %s, error: %v", tmplPath, err)
 		return
 	}
-	fmt.Print("/" + r.URL.Path)
-	// Define the data to pass to the template
+
 	data := struct {
 		Title     string
 		CSS       string
@@ -53,31 +57,27 @@ func dynamicHandler(w http.ResponseWriter, r *http.Request) {
 		PageTitle: pageTitle,
 	}
 
-	// Render the template if it exists
 	renderTemplate(w, tmplPath, data)
 }
 
 func setModeHandler(w http.ResponseWriter, r *http.Request) {
-	// Get the mode from the query string (e.g., ?mode=dark)
+	//(?mode=dark)
 	mode := r.URL.Query().Get("mode")
 	redirect := r.URL.Query().Get("redirect")
 	if mode != "light" && mode != "dark" {
-		mode = "light" // Default to light if invalid value
+		mode = "light"
 	}
 
-	// Set the mode cookie
 	http.SetCookie(w, &http.Cookie{
 		Name:    "mode",
 		Value:   mode,
-		Expires: time.Now().Add(365 * 24 * time.Hour), // 1-year expiration
-		Path:    "/",
+		Expires: time.Now().Add(365 * 24 * time.Hour), // 1y
 	})
-	// Redirect back to the homepage (or wherever you want)
+	//redirect back
 	http.Redirect(w, r, redirect, http.StatusSeeOther)
 }
 
 func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
-	// Parse layout and requested template
 	t, err := template.ParseFiles("templates/layout.html", tmpl)
 	if err != nil {
 		http.Error(w, "404 Not Found in renderTemplate", http.StatusNotFound)
@@ -85,7 +85,6 @@ func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 		return
 	}
 
-	// Execute the template with the provided data
 	err = t.Execute(w, data)
 	if err != nil {
 		http.Error(w, "Error rendering template", http.StatusInternalServerError)
@@ -95,19 +94,20 @@ func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 
 func main() {
 	http.HandleFunc("/", dynamicHandler)
-
-	cssFileServer := http.FileServer(http.Dir("./css"))
-
 	http.HandleFunc("/set-mode", setModeHandler)
-	http.Handle("/css/", http.StripPrefix("/css/", cssFileServer))
+
+	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
+	http.Handle("/media/", http.StripPrefix("/media/", http.FileServer(http.Dir("./media"))))
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	port := "8000"
 	fmt.Println("starting server on port", port)
-	log.Printf("Starting server on port %s", port)
 
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		log.Fatalf("Error starting server: %v", err)
+	} else {
+		fmt.Println("Succes!")
 	}
+
 }
