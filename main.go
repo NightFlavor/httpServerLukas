@@ -10,6 +10,12 @@ import (
 	"time"
 )
 
+func If[T any](cond bool, vtrue, vfalse T) T {
+	if cond {
+		return vtrue
+	}
+	return vfalse
+}
 func dynamicHandler(w http.ResponseWriter, r *http.Request) {
 	// Remove the leading slash and append ".html"
 	page := r.URL.Path[1:] // e.g., "/about" -> "about"
@@ -23,11 +29,11 @@ func dynamicHandler(w http.ResponseWriter, r *http.Request) {
 		pageTitle = "Welcome to Lukas' " + page + " page"
 	}
 
-	cookie, err := r.Cookie("mode")
-
 	w.Header().Set("Accept-CH", "Sec-CH-Prefers-Color-Scheme")
 	mode := r.Header.Get("Sec-CH-Prefers-Color-Scheme")
+	mode = If(mode != "", mode, "dark") //ternary terrorism
 
+	cookie, err := r.Cookie("mode")
 	if err == nil {
 		mode = cookie.Value
 	}
@@ -101,13 +107,12 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	port := "8000"
-	fmt.Println("starting server on port", port)
+	fmt.Println("Starting server on port: ", port)
 
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		log.Fatalf("Error starting server: %v", err)
-	} else {
-		fmt.Println("Succes!")
 	}
+	fmt.Println("Succes!")
 
 }
