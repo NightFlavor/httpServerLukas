@@ -1,8 +1,10 @@
 html {
     --accent: #638dfe;
+    --accent-hightlight: #476edc;
     --base00: #06070E;
     --base01: #0d0f16;
     --base02: #181922;
     --shadow: #010103;
     --text: #f0f3ff;
+    --inverted-text: var(--text);
 }
