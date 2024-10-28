@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -80,6 +81,9 @@ func setModeHandler(w http.ResponseWriter, r *http.Request) {
 		Expires: time.Now().Add(365 * 24 * time.Hour), // 1y
 	})
 	//redirect back
+	if strings.Contains(redirect, ".") {
+		return
+	}
 	http.Redirect(w, r, redirect, http.StatusSeeOther)
 }
 
@@ -101,18 +105,16 @@ func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 func main() {
 	http.HandleFunc("/", dynamicHandler)
 	http.HandleFunc("/set-mode", setModeHandler)
-
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
 	http.Handle("/media/", http.StripPrefix("/media/", http.FileServer(http.Dir("./media"))))
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	port := "8000"
 	fmt.Println("Starting server on port: ", port)
-
+	fmt.Println("Succes!")
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}
-	fmt.Println("Succes!")
 
 }

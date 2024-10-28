@@ -1,10 +1,54 @@
 {{ define "content" }}
 <h2>My projects:</h2>
-<a href="projects">projects</a>
+<div class="content_tiles">
+    <div class="tile">
+        <a href="https://chromewebstore.google.com/detail/smartschool++/bdhficnphioomdjhdfbhdepjgggekodf" target="_blank">
+            <img src="media\smpp_icon.png" alt="smpp_icon">
+
+        <h3 class="tile_sub_title">
+            Smartschool++
+        </h3>
+    </a>
+    <p>A school extension</p>
+    </div>
+    <div class="tile">
+        <a href="centered-div" target="_blank">
+            <div style="display: flex; justify-content: center; height: 200px;">
+                <div style="align-self: center; background-color: var(--accent); width: 100px; border-radius: 5px;box-shadow: 0px 0px 40px var(--accent);">
+                    <p>text</p>
+                </div>
+            </div>
+
+        <h3 class="tile_sub_title">
+            Centered div
+        </h3>
+    </a>
+    <p>A centered div</p>
+    </div>
+</div>
+<a class="button" href="projects">projects</a>
 <h2>Guitar:</h2>
-<a href="guitar">guitar</a>
+<div class="content_tiles">
+
+</div>
+<a class="button" href="guitar">guitar</a>
 <h2>Music:</h2>
-<a href="music">music</a>
+<div class="content_tiles">
+    <div class="tile">
+        <a href="https://music.apple.com/profile/lukazvb" target="_blank">
+            <img src="media\AM_icon.svg" alt="music_icon">
+
+        <h3 class="tile_sub_title">
+            My Profile
+        </h3>
+    </a>
+    <p>See my playlists</p>
+    </div>
+</div>
+<a class="button" href="music">music</a>
 <h2>Vacations:</h2>
-<a href="vacations">vacations</a>
+<div class="content_tiles">
+
+</div>
+<a class="button" href="vacations">vacations</a>
 {{ end }}

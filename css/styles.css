@@ -9,7 +9,7 @@
 }
 
 html {
-    --title-size: 3em;
+    --title-size: 68px;
     --sub-title-size: 2em;
     background-color: var(--base00);
 }
@@ -27,10 +27,6 @@ h1 {
     font-size: var(--title-size);
 }
 
-a{
-    color: var(--accent);
-}
-
 h2 {
     font-size: var(--sub-title-size);
 }
@@ -41,14 +37,14 @@ h2 {
     justify-content: center;
 }
 
-#light_dark_selectors {
+#light_dark_selectors,#home_button_div {
     display: flex;
     flex-direction: row;
     align-self: center;
     flex-wrap: wrap;
 }
 
-#light_mode_selector,#dark_mode_selector  {
+#light_mode_selector,#dark_mode_selector,#home_button  {
     fill: var(--text);
     padding: 5px;
     border-radius: 25%;
@@ -58,7 +54,7 @@ h2 {
     transition: ease-in-out;
 }
 
-#light_mode_selector:hover,#dark_mode_selector:hover  {
+#light_mode_selector:hover,#dark_mode_selector:hover ,#home_button:hover {
     background-color: var(--base02);
 }
 
@@ -66,8 +62,60 @@ h2 {
     margin: 0;
     flex-grow: 8;
 }
+#home_button{
+    margin-right: 25px;
+}
+#home_button_div{
+    justify-content: right;
+}
 
-#pseudo_div,#light_dark_selectors {
+#home_button_div,#light_dark_selectors {
     flex-grow: 1;
     width: 15%;
+}
+.content_tiles{
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+.button{
+    border-radius: 9999px;
+    padding: 0.8em;
+    background-color: var(--accent);
+    align-self: center;
+    opacity: 1;
+    transition-duration: 0.3s;
+    text-decoration: none;
+    font-weight: 500;
+}
+.button:hover{
+    backdrop-filter: brightness(150%);
+    padding-left: 1.2em;
+    padding-right: 1.2em;
+    letter-spacing: 2px;
+    font-weight: 700;
+    opacity: 0.9;
+}
+.tile{
+    border-radius: 25px;
+    background-color: var(--base01);
+    padding: 15px;
+    width: 200px;
+    transition: ease-in-out 0.25s;
+    margin-right: 12px;
+    margin-left: 12px;
+
+}
+.tile:hover{
+    transform: translateY(-15px);
+    scale: 1.03;
+    box-shadow: 0px 15px 50px var(--shadow);
+}
+.tile_sub_title{
+    font-weight: 500;
+    margin: 0px;
+    margin-top: 1em;
+}
+img{
+    border-radius: 15px;
 }

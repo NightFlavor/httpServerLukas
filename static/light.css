@@ -3,5 +3,9 @@ html {
     --base00: #f0f3ff;
     --base01: #e0e3ef;
     --base02: #d7dae6;
+    --shadow: #c1c3cf;
     --text: #010103;
+}
+.button{
+    color: var(--base00) !important;
 }
