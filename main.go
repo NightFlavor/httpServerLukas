@@ -25,9 +25,9 @@ func dynamicHandler(w http.ResponseWriter, r *http.Request) {
 	if page == "" {
 		page = "index"
 		pageName = "Home"
-		pageTitle = "Welcome to Lukas' portfolio:"
+		pageTitle = "Lukas' portfolio:"
 	} else {
-		pageTitle = "Welcome to Lukas' " + page + " page"
+		pageTitle = "Lukas' " + page + " page"
 	}
 
 	w.Header().Set("Accept-CH", "Sec-CH-Prefers-Color-Scheme")
