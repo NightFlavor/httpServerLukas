@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"html/template"
 	"log"
@@ -9,6 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	_ "github.com/lib/pq"
 )
 
 func If[T any](cond bool, vtrue, vfalse T) T {
@@ -102,12 +105,26 @@ func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
 	}
 }
 
+func connectDb() {
+	connStr := "postgres://postgres:admin@localhost:5432/gopgtest?sslmode=disable"
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatalf("Error connecting to db: %v", err)
+	}
+	if err = db.Ping(); err != nil {
+		log.Fatalf("Error pinging db: %v", err)
+	}
+	defer db.Close()
+}
+
 func main() {
 	http.HandleFunc("/", dynamicHandler)
 	http.HandleFunc("/set-mode", setModeHandler)
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
 	http.Handle("/media/", http.StripPrefix("/media/", http.FileServer(http.Dir("./media"))))
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
+	connectDb()
 
 	port := "8000"
 	fmt.Println("Starting server on port: ", port)

@@ -137,6 +137,7 @@ main {
     transform: translateY(-10px);
     scale: 1.05;
     box-shadow: 0px 15px 50px var(--shadow);
+    cursor: pointer;
 }
 
 .tile_sub_title {
