@@ -29,6 +29,12 @@ h2 {
     font-size: var(--sub-title-size);
 }
 
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 #top_bar {
     flex-direction: row;
     display: flex;
@@ -105,6 +111,7 @@ main {
     font-weight: 700;
     background-color: var(--accent-hightlight);
 }
+
 .content_tiles {
     padding: 20px 10px 20px 10px;
     background-color: var(--base01);
@@ -128,6 +135,7 @@ main {
     margin-right: 12px;
     margin-left: 12px;
 }
+
 .tile * {
     display: flex;
     flex-direction: column;
@@ -150,13 +158,21 @@ main {
 img {
     border-radius: 15px;
 }
-#centered_div{
+
+#centered_div {
     transition: ease-in-out;
 }
-#centered_div:hover{
+
+#centered_div:hover {
     animation: wobble 0.2s ease-in-out 0.1s infinite;
 }
+
 @keyframes wobble {
-    25%{rotate:3deg;}
-    75%{rotate:-3deg}
-  }
+    25% {
+        rotate: 3deg;
+    }
+
+    75% {
+        rotate: -3deg
+    }
+}
