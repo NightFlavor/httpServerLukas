@@ -10,7 +10,7 @@
 @media only screen and (max-width: 600px) {
     html {
         --title-size: 2em !important;
-        --sub-title-size: 1.2em !important;
+        --sub-title-size: 1.6em !important;
         --icon-size: 2rem !important
     }
 
@@ -22,7 +22,7 @@
 html {
     --title-size: 68px;
     --icon-size: 4rem;
-    --sub-title-size: 2em;
+    --sub-title-size: 3em;
     background-color: var(--base00);
 }
 
